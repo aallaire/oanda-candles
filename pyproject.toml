@@ -4,6 +4,8 @@ version = "0.0.1"
 description = "Oanda forex candle API built on top of oandapyV20"
 authors = ["Andrew Allaire <andrew.allaire@gmail.com>"]
 license = "Apache-2.0"
+readme = "Readme.md"
+repository = "https://github.com/aallaire/oanda-candles"
 
 [tool.poetry.dependencies]
 python = "^3.7"
