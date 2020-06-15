@@ -39,23 +39,23 @@ for candle in candles:
 The `CandleRequester.request()` has `start`, `end`, and `count`
 optional parameters used to specify how many candles and from when.
 
-| parameter | valid types | valid range | default |
-|: --- |: --- |:----|:----|
-| start | TimeInt, datetime, None | epoch to now | None |
-| end | TimeInt, datetime, None | epoch to now | now | 
-| count | int, None | 1 to 5000 | 500 |
+ parameter | valid types | valid range | default
+ --- | --- |---| ---
+start | TimeInt, datetime, None | epoch to now | --
+end | TimeInt, datetime, None | epoch to now | now
+count | int, None | 1 to 5000 | 500
 
 It does not make sense to set all three of these parameters, but you can
 specify any single one of them, or any two of them, or none of them.
 The behavior for when they are set or unset is shown in this table:
 
-| start | end | count | behavior |
-|: --- |: --- |:----|: --- |
-| -- | -- | -- | Get latest 500 candles |
-| -- | -- | set | Get latest count candles |
-| -- | set | -- | Get last 500 candles up until the end time |
-| -- | set | set | Get last count candles up until the end time | 
-| set | -- | -- | Get the first 500 candles from start time | 
-| set | -- | set | Get the first count candles from start time |
-| set | set | -- | Get candles from start to end times | 
-| set | set | set | ValueError (there might be a different count in the range) | 
+start | end | count | behavior
+ --- | --- | ---| ---
+-- | -- | -- | Get latest 500 candles
+-- | -- | set | Get latest count candles
+-- | set | -- | Get last 500 candles up until the end time
+-- | set | set | Get last count candles up until the end time
+set | -- | -- | Get the first 500 candles from start time
+set | -- | set | Get the first count candles from start time
+set | set | -- | Get candles from start to end times
+set | set | set | ValueError (there might be a different count in the range)
