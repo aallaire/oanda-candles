@@ -6,8 +6,11 @@ authors = ["Andrew Allaire <andrew.allaire@gmail.com>"]
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 pytest = "^5.4.2"
+requests = "^2.23.0"
+time-int = "^0.0.2"
+magic-kind = "^0.2.1"
 
 [tool.poetry.dev-dependencies]
 oandapyV20 = "^0.6.3"
