@@ -1,11 +1,10 @@
-from typing import Iterable, Optional, Tuple
+from typing import Optional, Tuple, Iterable
 from forex_types import Pair
 from time_int import TimeInt
 import json
 
 from .gran import Gran, GRAN_DICT
 from .candle import Candle
-from .candle_bank import CandleBank
 
 
 class CandleSequenceError(Exception):
@@ -105,21 +104,6 @@ class CandleSequence:
             self.start: TimeInt = TimeInt.MAX
             self.end: TimeInt = TimeInt.MIN
 
-    def crop(self, start: TimeInt, end: TimeInt) -> "CandleSequence":
-        """Return part of CandleSequence that falls within time range.
-
-        Args:
-            start: Remove candles from before this time.
-            end: Remove candles from after this time.
-        Returns:
-            CandleSequence, possibly empty.
-        """
-        cropped_candles = []
-        for candle in self.candles:
-            if start <= candle.time <= end:
-                cropped_candles.append(candle)
-        return CandleSequence(self.pair, self.gran, cropped_candles)
-
     def make_copy(self) -> "CandleSequence":
         """Return a copy of this CandleSequence."""
         return CandleSequence(self.pair, self.gran, self.candles)
@@ -155,76 +139,6 @@ class CandleSequence:
 
     def __getitem__(self, item: int):
         return self.candles[item]
-
-    @staticmethod
-    def can_merge(first: "CandleSequence", second: "CandleSequence") -> bool:
-        """Determine if two CandleSequences can be merged."""
-        # pair and gran must match
-        if first.pair != second.pair or first.gran != second.gran:
-            return False
-        # In special case where at least one is empty they can be merged
-        if not first.candles or not second.candles:
-            return True
-        # Check if start of second is within range of first
-        if first.start <= second.start <= first.end:
-            return True
-        # Check if end of second is within range of first
-        if first.start <= second.end <= first.end:
-            return True
-        # Check if start of first is within range of second
-        if second.start <= first.start <= second.end:
-            return True
-        # Check if end of first is within range of second
-        if second.start <= first.end <= second.end:
-            return True
-        # If we are still here, they are not both empty, and there is no overlap
-        return False
-
-    @classmethod
-    def merge(
-        cls, first: "CandleSequence", second: "CandleSequence"
-    ) -> "CandleSequence":
-        """Merge two candle sequences. Raise CandleSequenceError if they can not be merged."""
-        if not cls.can_merge(first, second):
-            raise CandleSequenceError(
-                "Attempt to merge CandleSequences that can not be merged."
-            )
-        # Handle special case of at least one sequence being empty.
-        if not first:
-            return second.make_copy()
-        elif not second:
-            return first.make_copy()
-        # Make sure the first is really the first.
-        if first > second:
-            place_holder = first
-            first = second
-            second = place_holder
-        # Handle special case where first extends past the second.
-        if first.end >= second.end:
-            return first.make_copy()
-        # With special cases out of the way, we make a list of candles
-        # with the ones in first that come before the ones in second,
-        # followed by the ones in second.
-        candle_list = []
-        for candle in first.candles:
-            if candle.time >= second.start:
-                break
-            candle_list.append(candle)
-        for candle in second.candles:
-            candle_list.append(candle)
-        return CandleSequence(first.pair, first.gran, candle_list)
-
-    def write(self):
-        bank = CandleBank(self.pair, self.gran)
-        path = bank.get_file_path()
-        path.write_text(self.to_storage_json())
-
-    @classmethod
-    def read(cls, pair, gran) -> "CandleSequence":
-        bank = CandleBank(pair, gran)
-        path = bank.get_file_path()
-        text = path.read_text()
-        return cls.from_storage_json(text)
 
     def __len__(self):
         return len(self.candles)

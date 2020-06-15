@@ -11,16 +11,7 @@ from .gran import Gran
 
 
 class CandleRequester:
-    """For getting candle data with queries to Oanda V20 API.
-
-    Method Summary:
-        starting_from : candles matching given time and later.
-        starting_after: candles later than given time.
-        ending_on     :
-
-
-
-    """
+    """For getting candle data with queries to Oanda V20 API."""
 
     DEFAULT_COUNT = 500
     MAX_COUNT = 5000
@@ -97,23 +88,3 @@ class CandleRequester:
         request = InstrumentsCandles(instrument=self.instrument, params=params)
         response = self.api.request(request)
         return CandleSequence.from_oanda(response)
-
-    def starting_from(self, start: TimeInt) -> CandleSequence:
-        """Request candles starting FROM given time."""
-        params = dict(self.base_params)
-        params["from"] = str(start)
-        request = InstrumentsCandles(instrument=self.instrument, params=params)
-        response = self.api.request(request)
-        return CandleSequence.from_oanda(response)
-
-    def starting_after(self, start: TimeInt) -> CandleSequence:
-        """Request candles starting AFTER given time."""
-        params = dict(self.base_params)
-        params["from"] = str(start)
-        params["includeFirst"] = False
-        request = InstrumentsCandles(instrument=self.instrument, params=params)
-        response = self.api.request(request)
-        return CandleSequence.from_oanda(response)
-
-    def request_up_to(self, end: TimeInt) -> CandleSequence:
-        pass
