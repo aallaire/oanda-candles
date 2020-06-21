@@ -48,11 +48,11 @@ version = "0.4.3"
 
 [[package]]
 category = "main"
-description = "Basic Forex classes"
+description = "Basic Forex Classes"
 name = "forex-types"
 optional = false
-python-versions = "*"
-version = "0.0.5"
+python-versions = ">=3.5,<4.0"
+version = "0.0.6"
 
 [[package]]
 category = "main"
@@ -83,8 +83,8 @@ category = "main"
 description = "The MagicKind type is a simpler alternative to Enum types for groups of related magic values when order is not important."
 name = "magic-kind"
 optional = false
-python-versions = ">=3.7,<4.0"
-version = "0.2.1"
+python-versions = ">=3.5,<4.0"
+version = "0.2.2"
 
 [[package]]
 category = "main"
@@ -112,6 +112,18 @@ version = "20.4"
 
 [package.dependencies]
 pyparsing = ">=2.0.2"
+six = "*"
+
+[[package]]
+category = "main"
+description = "Object-oriented filesystem paths"
+marker = "python_version < \"3.6\""
+name = "pathlib2"
+optional = false
+python-versions = "*"
+version = "2.3.5"
+
+[package.dependencies]
 six = "*"
 
 [[package]]
@@ -168,6 +180,10 @@ wcwidth = "*"
 python = "<3.8"
 version = ">=0.12"
 
+[package.dependencies.pathlib2]
+python = "<3.6"
+version = ">=2.2.0"
+
 [package.extras]
 checkqa-mypy = ["mypy (v0.761)"]
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
@@ -203,8 +219,8 @@ category = "main"
 description = "Subclass of integer representing seconds since UNIX epoch"
 name = "time-int"
 optional = false
-python-versions = ">=3.6,<4.0"
-version = "0.0.2"
+python-versions = ">=3.5,<4.0"
+version = "0.0.3"
 
 [package.dependencies]
 pytest = ">=5.4.2,<6.0.0"
@@ -236,16 +252,16 @@ description = "Backport of pathlib-compatible object wrapper for zip files"
 marker = "python_version < \"3.8\""
 name = "zipp"
 optional = false
-python-versions = ">=3.6"
-version = "3.1.0"
+python-versions = ">=2.7"
+version = "1.2.0"
 
 [package.extras]
 docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
-testing = ["jaraco.itertools", "func-timeout"]
+testing = ["pathlib2", "unittest2", "jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "88ea7d645b4a519deb36931ad4ba5c233a49a8c754b76047cc35b10b40714dd4"
-python-versions = "^3.7"
+content-hash = "fa3dfba9d20154ed9496db61f2388a06a2d5662dfdffdc2f685ed1c390da58b2"
+python-versions = "^3.5"
 
 [metadata.files]
 atomicwrites = [
@@ -269,8 +285,8 @@ colorama = [
     {file = "colorama-0.4.3.tar.gz", hash = "sha256:e96da0d330793e2cb9485e9ddfd918d456036c7149416295932478192f4436a1"},
 ]
 forex-types = [
-    {file = "forex-types-0.0.5.tar.gz", hash = "sha256:703fbdaabc21d64125b769e5c7630d988ee0c7b479831752b7b733e7835ad2f1"},
-    {file = "forex_types-0.0.5-py3-none-any.whl", hash = "sha256:6ce34d80be5f8a506db2b411006804ae089fec0bb41fe83b36c9a3208c6dfe3a"},
+    {file = "forex-types-0.0.6.tar.gz", hash = "sha256:b962ebdce6909fd3ae017d25d5a4acde662737e7595ed444f9b78c5267055867"},
+    {file = "forex_types-0.0.6-py3-none-any.whl", hash = "sha256:721cae54f959fb6f32ea30096ebd948d1fdd2a7bb3749bb928b542666cac80e1"},
 ]
 idna = [
     {file = "idna-2.9-py2.py3-none-any.whl", hash = "sha256:a068a21ceac8a4d63dbfd964670474107f541babbd2250d61922f029858365fa"},
@@ -281,8 +297,8 @@ importlib-metadata = [
     {file = "importlib_metadata-1.6.1.tar.gz", hash = "sha256:0505dd08068cfec00f53a74a0ad927676d7757da81b7436a6eefe4c7cf75c545"},
 ]
 magic-kind = [
-    {file = "magic-kind-0.2.1.tar.gz", hash = "sha256:d1c6f1f6f4975128a23bd6350e95e649313ecd821e6f8d172ca805a428123bcc"},
-    {file = "magic_kind-0.2.1-py3-none-any.whl", hash = "sha256:773fd7b7ddf58172d96b9cd217c23ef62a770848658279dd1e0ba05e89de007e"},
+    {file = "magic-kind-0.2.2.tar.gz", hash = "sha256:79740235e41290cd0b30c0da46d2ae4604ab07957249f490e8525857dad9fd22"},
+    {file = "magic_kind-0.2.2-py3-none-any.whl", hash = "sha256:41080236d46eb1c1bf5c3e9d4e1b789f62c86b1a422fa5f45e78893dd6e14589"},
 ]
 more-itertools = [
     {file = "more-itertools-8.4.0.tar.gz", hash = "sha256:68c70cc7167bdf5c7c9d8f6954a7837089c6a36bf565383919bb595efb8a17e5"},
@@ -294,6 +310,10 @@ oandapyv20 = [
 packaging = [
     {file = "packaging-20.4-py2.py3-none-any.whl", hash = "sha256:998416ba6962ae7fbd6596850b80e17859a5753ba17c32284f67bfff33784181"},
     {file = "packaging-20.4.tar.gz", hash = "sha256:4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d556079f8"},
+]
+pathlib2 = [
+    {file = "pathlib2-2.3.5-py2.py3-none-any.whl", hash = "sha256:0ec8205a157c80d7acc301c0b18fbd5d44fe655968f5d947b6ecef5290fc35db"},
+    {file = "pathlib2-2.3.5.tar.gz", hash = "sha256:6cd9a47b597b37cc57de1c05e56fb1a1c9cc9fab04fe78c29acd090418529868"},
 ]
 pluggy = [
     {file = "pluggy-0.13.1-py2.py3-none-any.whl", hash = "sha256:966c145cd83c96502c3c3868f50408687b38434af77734af1e9ca461a4081d2d"},
@@ -320,8 +340,8 @@ six = [
     {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
 ]
 time-int = [
-    {file = "time-int-0.0.2.tar.gz", hash = "sha256:0d446efbfbf66d63f4667fb2143b8deadd66075507aa0fa8e676a7fe4325788a"},
-    {file = "time_int-0.0.2-py3-none-any.whl", hash = "sha256:7cb37706ce8097f6a448c2c237c98f0ecb550d9c58f620fdb5b7f2626995d919"},
+    {file = "time-int-0.0.3.tar.gz", hash = "sha256:07dba02b2dc1f0e885ea7d6f6f31f2874bf907d879c6fd94c159da9a2e1bfb40"},
+    {file = "time_int-0.0.3-py3-none-any.whl", hash = "sha256:450a06878bde55ae8f805cecd3f80b5d1fc4ca776c24ab1ffe1ac86073c8339f"},
 ]
 urllib3 = [
     {file = "urllib3-1.25.9-py2.py3-none-any.whl", hash = "sha256:88206b0eb87e6d677d424843ac5209e3fb9d0190d0ee169599165ec25e9d9115"},
@@ -332,6 +352,6 @@ wcwidth = [
     {file = "wcwidth-0.2.4.tar.gz", hash = "sha256:8c6b5b6ee1360b842645f336d9e5d68c55817c26d3050f46b235ef2bc650e48f"},
 ]
 zipp = [
-    {file = "zipp-3.1.0-py3-none-any.whl", hash = "sha256:aa36550ff0c0b7ef7fa639055d797116ee891440eac1a56f378e2d3179e0320b"},
-    {file = "zipp-3.1.0.tar.gz", hash = "sha256:c599e4d75c98f6798c509911d08a22e6c021d074469042177c8c86fb92eefd96"},
+    {file = "zipp-1.2.0-py2.py3-none-any.whl", hash = "sha256:e0d9e63797e483a30d27e09fffd308c59a700d365ec34e93cc100844168bf921"},
+    {file = "zipp-1.2.0.tar.gz", hash = "sha256:c70410551488251b0fee67b460fb9a536af8d6f9f008ad10ac51f615b6a521b1"},
 ]
