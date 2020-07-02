@@ -57,8 +57,8 @@ Gran.H6 = Gran(GranUnit.HOUR, 6)
 Gran.H8 = Gran(GranUnit.HOUR, 8)
 Gran.H12 = Gran(GranUnit.HOUR, 12)
 Gran.D = Gran(GranUnit.DAY, None)
-Gran.W = Gran(GranUnit.DAY, None)
-Gran.M = Gran(GranUnit.DAY, None)
+Gran.W = Gran(GranUnit.WEEK, None)
+Gran.M = Gran(GranUnit.MONTH, None)
 
 GRAN_TUPLE = (
     Gran.S5,

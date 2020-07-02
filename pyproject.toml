@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "oanda-candles"
-version = "0.0.4"
+version = "0.0.6"
 description = "Oanda forex candle API built on top of oandapyV20"
 authors = ["Andrew Allaire <andrew.allaire@gmail.com>"]
 license = "Apache-2.0"
@@ -11,7 +11,7 @@ repository = "https://github.com/aallaire/oanda-candles"
 python = "^3.5"
 requests = "^2.23.0"
 time-int = "^0.0.3"
-magic-kind = "^0.2.1"
+magic-kind = "^0.2.2"
 oandapyV20 = "^0.6.3"
 forex-types = "^0.0.6"
 
