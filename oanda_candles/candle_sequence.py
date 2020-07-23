@@ -14,6 +14,10 @@ class CandleSequenceError(Exception):
 class CandleSequence:
     """Series of Candle objects for same pair and granularity.
 
+    TODO(0.0.7): CandleSequences do not have the merging described in this __doc__ yet.
+    Also might abandon the entire immutable approach in favor of a dynamic one,
+    so letting this sit for now
+
     WARNING - Treat as Immutable:
         CandleSequence objects should be treated as if they were
     immutable. Adding or deleting candles or otherwise altering

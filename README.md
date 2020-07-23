@@ -19,8 +19,7 @@ the opening bid price of the latest 100 trading hours for the Aussie like this:
 ```python
 from oanda_candles import CandleRequester, Pair, Gran
 
-aud_usd = Pair("audusd")
-requester = CandleRequester(token, aud_usd, Gran.H1)
+requester = CandleRequester(token, Pair.AUD_USD, Gran.H1)
 candles = requester.request(count=100)
 
 for candle in candles:
