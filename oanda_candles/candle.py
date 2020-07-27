@@ -67,33 +67,19 @@ class Candle:
     def __str__(self):
         return f"<Candle: {self.time.get_pretty()}>"
 
-    def __eq__(self, other):
-        """Comparison only uses age of candle and if it is complete or not."""
-        if not isinstance(other, Candle):
-            return NotImplemented
-        if self.time != other.time:
-            return False
-        elif self.complete != other.complete:
-            return False
-        return True
-
-    def __lt__(self, other):
-        """More recent candles are considered greater than older candles.
-
-        Note that closed candles are considered more recent then
-        candles of the same time that are not yet closed.
-        """
-        if not isinstance(other, Candle):
-            return NotImplemented
-        if self.time < other.time:
-            return True
-        elif self.time > other.time:
-            return False
-        elif other.complete and not self.complete:
-            return True
+    def __eq__(self, other) -> bool:
+        """Comparison includes all the data in candle."""
+        if isinstance(other, Candle):
+            return (
+                self.ask == other.ask
+                and self.bid == other.bid
+                and self.mid == other.mid
+                and self.time == other.time
+                and self.complete == other.complete
+            )
         else:
-            return False
+            return NotImplemented
 
     def __hash__(self):
-        """Hash only cares about time of candle."""
+        """We just use time to hash candles into buckets."""
         return hash(self.time)

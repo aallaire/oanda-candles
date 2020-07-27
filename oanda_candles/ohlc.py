@@ -26,3 +26,15 @@ class Ohlc:
         return cls(
             Price(data["o"]), Price(data["h"]), Price(data["l"]), Price(data["c"])
         )
+
+    def __eq__(self, other) -> bool:
+        """Equal only when all four prices are equal."""
+        if isinstance(other, Ohlc):
+            return (
+                self.o == other.o
+                and self.h == other.h
+                and self.l == other.l
+                and self.c == other.c
+            )
+        else:
+            return NotImplemented
