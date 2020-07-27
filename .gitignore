@@ -130,3 +130,6 @@ dmypy.json
 
 # Added for IntelliJ IDE
 .idea/
+
+# Added to hide sandox script used in development
+sand.py

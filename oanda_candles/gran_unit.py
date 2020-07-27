@@ -1,3 +1,6 @@
+from typing import Optional
+
+
 class SecondsPer:
     SECOND = 1
     MINUTE = 60
@@ -35,12 +38,12 @@ class GranUnit:
     def __hash__(self):
         return hash(self.duration)
 
-    SECOND = None
-    MINUTE = None
-    HOUR = None
-    DAY = None
-    WEEK = None
-    MONTH = None
+    SECOND: Optional["GranUnit"] = None
+    MINUTE: Optional["GranUnit"] = None
+    HOUR: Optional["GranUnit"] = None
+    DAY: Optional["GranUnit"] = None
+    WEEK: Optional["GranUnit"] = None
+    MONTH: Optional["GranUnit"] = None
 
 
 GranUnit.SECOND = GranUnit("S", "second", SecondsPer.SECOND)

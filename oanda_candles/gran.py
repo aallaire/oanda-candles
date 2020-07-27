@@ -11,7 +11,16 @@ class Gran:
     H1 = H2 = H3 = H4 = H6 = H8 = H12 = None
     D = W = M = None
 
-    def __init__(self, unit: GranUnit, amount: Optional[int]):
+    def __init__(self, unit: GranUnit, amount: Optional[int], freshness: int = 10):
+        """Initialization should not need to be called outside this module.
+
+        Args:
+            unit: e.g. seconds, minutes, hours, day, week, or month.
+            amount: number of these units or None in case of day, week, or month
+            freshness: number of seconds before considering last update to candles
+                       of this granularity to be no longer fresh enough.
+        """
+        self.freshness = freshness
         if amount is None:
             self.oanda = unit.letter  # e.g. "M" for monthly
             self.name = unit.name
@@ -38,18 +47,18 @@ class Gran:
         return hash(self.duration)
 
 
-Gran.S5 = Gran(GranUnit.SECOND, 5)
-Gran.S10 = Gran(GranUnit.SECOND, 10)
-Gran.S15 = Gran(GranUnit.SECOND, 15)
-Gran.S30 = Gran(GranUnit.SECOND, 30)
-Gran.M1 = Gran(GranUnit.MINUTE, 1)
-Gran.M2 = Gran(GranUnit.MINUTE, 2)
+Gran.S5 = Gran(GranUnit.SECOND, 5, freshness=1)
+Gran.S10 = Gran(GranUnit.SECOND, 10, freshness=1)
+Gran.S15 = Gran(GranUnit.SECOND, 15, freshness=2)
+Gran.S30 = Gran(GranUnit.SECOND, 30, freshness=3)
+Gran.M1 = Gran(GranUnit.MINUTE, 1, freshness=6)
+Gran.M2 = Gran(GranUnit.MINUTE, 2)  # freshness=10 is default
 Gran.M4 = Gran(GranUnit.MINUTE, 4)
 Gran.M5 = Gran(GranUnit.MINUTE, 5)
 Gran.M10 = Gran(GranUnit.MINUTE, 10)
 Gran.M15 = Gran(GranUnit.MINUTE, 15)
 Gran.M30 = Gran(GranUnit.MINUTE, 30)
-Gran.H1 = Gran(GranUnit.HOUR, 1)
+Gran.H1 = Gran(GranUnit.HOUR, 1, 10)
 Gran.H2 = Gran(GranUnit.HOUR, 2)
 Gran.H3 = Gran(GranUnit.HOUR, 3)
 Gran.H4 = Gran(GranUnit.HOUR, 4)
