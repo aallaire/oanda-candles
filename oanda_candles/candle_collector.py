@@ -100,6 +100,11 @@ class CandleCollector:
         self._update_present()
         return self._candles[-count:]
 
+    def tail(self) -> List[Candle]:
+        """Get only more recent information since last grab or tail."""
+        # TODO
+        raise NotImplemented("Nice idea maybe, but not implemented yet.")
+
     # --------------------------------------------------------------------------
     # Helper Methods
     # --------------------------------------------------------------------------
@@ -133,6 +138,7 @@ class CandleCollector:
             # We should check if its any different than previous version.
             old_last: Candle = self._candles[-1]
             new_last: Candle = sequence[0]
+            self._last_update = monotonic()
             if old_last == new_last:
                 if elapsed_time > 300:
                     # No new data for more than 5 minutes indicates sleepiness.
@@ -140,7 +146,6 @@ class CandleCollector:
                 return False
             else:
                 self._extend(sequence)
-                self._last_update = monotonic()
                 return True
         elif sequence:
             # In this case we have new candles, so we should add them.
