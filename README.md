@@ -4,6 +4,17 @@ Oanda forex candle API built on top of oandapyV20
 #### CAVEAT:
 This is still in rapid initial development and features might change drastically.
 
+new in version 0.0.8:
+1. Added CandleClient to manage multiple CandleCollector objects from one object.
+1. Plus a CandleMeister that wraps a single CandleClient for easy global access
+1. Fixed a bug that was causing too many requests when they were not needed.
+1. Had idea for `tail` method as a variant on `grab` method, where it returns only
+the newest candle information since the last call to eitehr `grab` or `tail`. Made
+a place holder for it, but not implementing it yet.
+1. Still behind on unit tests, but still was able to do sand-box testing with market open.
+--which is how I found and fixed bug above. This package is still far from prime time ready.
+
+
 new in version 0.0.7:
 1. The `CandleSequence` has been cleaned up and plans to add merging have been abandoned.
 1. The `Candle` class no longer has `__lt__` overloaded and `__eq__` is now based on all the values being equal rather than just the candle time.
@@ -49,6 +60,36 @@ Note the CandleCollector remembers the candles it downloads and also keeps track
 some heuristics about when it should download updates to them, such that you can spam run its `grab(count)` method
 in an event loop without worrying about spamming the Oanda API.
 
+### Using CandleMeister
+The `CandleMeister` is a single globally available class that manages one `CandleCollector` for each
+pair/granularity combination. While the `CandleClient` is the same idea but as an object where you
+can have more than one...in those cases where you may want more than one...which I can't think of.
+
+To use the CandleMeister to grab any candles, you must make sure it that it is initialized
+with the Oanda token. For example if the env var `OANDA_TOKEN` has your token do the following
+right at the startup of your application before you create your widgets:
+```python
+import os
+from oanda_candles import CandleMeister
+
+token = os.getenv("OANDA_TOKEN")
+CandleMeister.init_meister(token)
+```
+Then you can you can grab candles from any module you like (provided you don't do it at import time)
+like so:
+```python
+from oanda_candles import CandleMeister, Pair, Gran
+
+...
+def some_func(*args, **kwargs):
+    ...
+    euro_weekly_candles = CandleMeister.grab(Pair.EUR_USD, Gran.W, 100)
+    ...
+```
+Note that if the `CandleMeister.grab` method was used outside of the function in this
+example, then it would probably end up called as your modules were imported before your
+were able to initialize the CandleMeister with the token. It is thus recommended you
+keep such calls inside callback methods and not try to make them at import time.
 
 ### Summary of Basic Usage
 1. A `CandleCollector` object is initialized with a token, forex pair, and granularity.
