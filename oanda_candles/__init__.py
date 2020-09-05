@@ -1,4 +1,4 @@
-__version__ = "0.0.8"
+__version__ = "0.0.9"
 
 from forex_types import Pair, Price
 from time_int import TimeInt

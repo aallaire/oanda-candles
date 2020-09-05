@@ -21,6 +21,15 @@ class CandleClient:
             )
         return collector.grab(count)
 
+    def get_collector(self, pair: Pair, gran: Gran) -> CandleCollector:
+        """Get the collector that matches pair and gran."""
+        collector = self._collectors.get((pair, gran))
+        if collector is None:
+            collector = self._collectors[(pair, gran)] = CandleCollector(
+                self.token, pair, gran
+            )
+        return collector
+
 
 class CandleMeister:
     """Class method/singleton-ish variant on CandleClient"""
@@ -38,6 +47,10 @@ class CandleMeister:
     @classmethod
     def grab(cls, pair: Pair, gran: Gran, count: int) -> List[Candle]:
         return cls.__client.grab(pair, gran, count)
+
+    @classmethod
+    def get_collector(cls, pair: Pair, gran: Gran) -> CandleCollector:
+        return cls.__client.get_collector(pair, gran)
 
     @classmethod
     def clear_cache(cls):
