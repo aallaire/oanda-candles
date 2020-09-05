@@ -4,6 +4,11 @@ Oanda forex candle API built on top of oandapyV20
 #### CAVEAT:
 This is still in rapid initial development and features might change drastically.
 
+new in version 0.0.9:
+1. CandleMeister and CandleClient now have a method to get the collector they use
+for a specific pair and granularity.
+1. Updated some dependencies to latest versions.
+
 new in version 0.0.8:
 1. Added CandleClient to manage multiple CandleCollector objects from one object.
 1. Plus a CandleMeister that wraps a single CandleClient for easy global access
