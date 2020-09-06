@@ -4,6 +4,9 @@ Oanda forex candle API built on top of oandapyV20
 #### CAVEAT:
 This is still in rapid initial development and features might change drastically.
 
+new in version 0.0.10:
+1. Updated time-int dependency from 0.0.6 to 0.0.7.
+
 new in version 0.0.9:
 1. CandleMeister and CandleClient now have a method to get the collector they use
 for a specific pair and granularity.

@@ -10,7 +10,7 @@ repository = "https://github.com/aallaire/oanda-candles"
 [tool.poetry.dependencies]
 python = "^3.5"
 requests = "^2.23.0"
-time-int = "^0.0.6"
+time-int = "^0.0.7"
 magic-kind = "^0.2.2"
 oandapyV20 = "^0.6.3"
 forex-types = "^0.0.6"
