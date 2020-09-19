@@ -220,7 +220,7 @@ description = "Subclass of integer representing seconds since UNIX epoch"
 name = "time-int"
 optional = false
 python-versions = ">=3.5,<4.0"
-version = "0.0.7"
+version = "0.0.9"
 
 [package.dependencies]
 magic-kind = ">=0.2.2,<0.3.0"
@@ -261,7 +261,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "unittest2", "jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "9161bdcfb88d58262fb5efc59a426cdc44bf6793f64677335405ef738687e3eb"
+content-hash = "9919e9009ddbad7e2ff3cc0573ca099de3ec2835a4cb2bbce14df9700cce4903"
 python-versions = "^3.5"
 
 [metadata.files]
@@ -341,8 +341,8 @@ six = [
     {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
 ]
 time-int = [
-    {file = "time-int-0.0.7.tar.gz", hash = "sha256:5ef3911747ba8e15f3c76a6f0ca776e2cb3f3776026e8480569bf43a42fa696f"},
-    {file = "time_int-0.0.7-py3-none-any.whl", hash = "sha256:5f583b3a776da436c0e9abbadef3590950e559a4c54d2abb8d881bedbd5798e0"},
+    {file = "time-int-0.0.9.tar.gz", hash = "sha256:c439bab4b7a01f8af1fb99ad622f2a6cdfe0dc1969c3eda63b2e2574245b13a7"},
+    {file = "time_int-0.0.9-py3-none-any.whl", hash = "sha256:8b30f3c0ece12f3b8204b281d8f85844934a1c8dacb0e594b33365cd7ac0fe13"},
 ]
 urllib3 = [
     {file = "urllib3-1.25.10-py2.py3-none-any.whl", hash = "sha256:e7983572181f5e1522d9c98453462384ee92a0be7fac5f1413a1e35c56cc0461"},

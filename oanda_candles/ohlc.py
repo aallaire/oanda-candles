@@ -1,4 +1,4 @@
-from forex_types import Price
+from forex_types import Price, FracPips
 from typing import Tuple
 
 
@@ -10,6 +10,26 @@ class Ohlc:
         self.h = h
         self.l = l
         self.c = c
+
+    @property
+    def o_fp(self) -> FracPips:
+        """Open price as Fractional Pips."""
+        return FracPips.from_price(self.o)
+
+    @property
+    def h_fp(self) -> FracPips:
+        """High price as Fractional Pips."""
+        return FracPips.from_price(self.h)
+
+    @property
+    def l_fp(self) -> FracPips:
+        """Low price as Fractional Pips."""
+        return FracPips.from_price(self.l)
+
+    @property
+    def c_fp(self) -> FracPips:
+        """Closing price as Fractional Pips."""
+        return FracPips.from_price(self.c)
 
     def to_tuple(self) -> Tuple[str, str, str, str]:
         """Get tuple that can be used in json serialization of Ohlc."""
