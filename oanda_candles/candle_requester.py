@@ -1,90 +1,113 @@
-from forex_types import Pair
-from oandapyV20 import API
-from time_int import TimeInt
-from oandapyV20.endpoints.instruments import InstrumentsCandles
-from typing import Optional, Union
-from datetime import datetime
-import json
+from requests import Session
+from typing import List
+from urllib.parse import urljoin
 
-from .candle_sequence import CandleSequence
-from .gran import Gran
+from forex_types import Pair
+from time_int import TimeInt
+
+from oanda_candles.gran import Gran
+from oanda_candles.candle import Candle
+
+
+class UrlRoot:
+    real_url = "https://api-fxtrade.oanda.com"
+    practice_url = "https://api-fxpractice.oanda.com"
 
 
 class CandleRequester:
-    """For getting candle data with queries to Oanda V20 API."""
-
-    DEFAULT_COUNT = 500
-    MAX_COUNT = 5000
-
-    def __init__(self, token: str, pair: Pair, gran: Gran):
-        """Init object to request candles of a given pair and granularity.
-
-        Args:
-            token: secret access token to oanda account
-            pair: forex pair which candles are about.
-            gran: oanda granularity e.g. "H2" for two hour candles.
-        """
-        # Create oandapyV20 API object.
-        self.api = API(access_token=token, headers={"Accept-Datetime-Format": "UNIX"})
-        # Handle case of pair or gran being passed as a str.
-        if isinstance(pair, str):
-            pair = Pair(pair)
-        if isinstance(gran, str):
-            gran = Gran(gran)
-        # Now make basic assignments of instance data
-        self.instrument = str(pair)
-        self.pair = pair
-        self.gran = gran
-        self.base_params = {
+    def __init__(self, client, pair: Pair, gran: Gran):
+        self.session: Session = client.session
+        root_url = UrlRoot.real_url if client.real else UrlRoot.practice_url
+        self.url = urljoin(root_url, f"/v3/instruments/{pair}/candles")
+        self.headers = {
+            "Accept-Datetime-Format": "UNIX",
+            "Authorization": f"Bearer {client.token}",
+            "ContentType": "application/json",
+        }
+        self.params = {
+            "alignmentTimezone": "Etc/GMT+1",
+            "dailyAlignment": 23,
             "granularity": str(gran),
             "price": "BAM",
+            "weeklyAlignment": "Sunday",
         }
+        self.history_reached: bool = False
 
-    def request(
-        self,
-        start: Union[TimeInt, datetime, None] = None,
-        end: Union[TimeInt, datetime, None] = None,
-        count: Optional[int] = None,
-        include_first=True,
-    ) -> CandleSequence:
-        """Make request for candles from Oanda V20.
+    def get(self, count: int) -> List[Candle]:
+        """Request the most recent count candles."""
+        if count < 5000:
+            return self._request(count=count)
+        candles = self._request(count=2000)
+        if len(candles) >= 2000:
+            extra = count - 2000
+            self.prepend(candles, extra)
+        return candles
+
+    def get_before(self, time: TimeInt, count: int) -> List[Candle]:
+        return self._request(count=count, before=time)
+
+    def get_after(self, time: TimeInt):
+        return self._request(after=time)
+
+    def prepend(self, candles: List[Candle], count: int) -> bool:
+        """Prepend candles to front of a list (recurse if needed).
 
         Args:
-            start: Start of time range.
-            end: End of time range.
-            count: Number of candles to retrieve.
-            include_first: whether to include first candle at start time.
-        Raises:
-            ValueError: if start, end, and count are all set.
+            candles: list of candles that is prepended with older candles.
+            count: number of candles to prepend. If 0 or less do nothing.
+        Returns:
+            True if the requested number of candles is provided.
+            False if Oanda ran out of candles to give us.
         """
-        if isinstance(start, datetime):
-            start = TimeInt(start.timestamp())
-        if isinstance(end, datetime):
-            end = TimeInt(end.timestamp())
-        params = dict(self.base_params)
-        if start is None and end is None and count is None:
-            params["count"] = self.DEFAULT_COUNT
-        elif start is None and end is None:
-            params["count"] = count
-        elif start is None and count is None:
-            params["count"] = self.DEFAULT_COUNT
-            params["to"] = str(end)
-        elif start is None:
-            params["count"] = count
-            params["to"] = str(end)
-        elif end is None and count is None:
-            params["from"] = str(start)
-            params["includeFirst"] = include_first
-        elif end is None:
-            params["from"] = str(start)
-            params["count"] = count
-            params["includeFirst"] = include_first
-        elif count is None:
-            params["from"] = str(start)
-            params["to"] = str(end)
-            params["includeFirst"] = include_first
+        if count <= 0:
+            return True
+        first_candle_time = candles[0].time if candles else TimeInt.now()
+        pull_size = count if count <= 5000 else 2000
+        new_candles = self._request(count=pull_size, before=first_candle_time)
+        if len(new_candles):
+            candles[0:0] = new_candles
+            if len(new_candles) < pull_size:
+                return False
+            else:
+                if count > pull_size:
+                    return self.prepend(candles, count - pull_size)
+                return True
+        return False
+
+    def extend(self, candles: List[Candle]) -> bool:
+        """Extend candles to back of a list up to current time (recurse if needed).
+
+        Args:
+            candles: list of candles that is extended with newer candles.
+        Returns:
+            True if the last candle we end up with is complete
+            False if the lst candle we end up with is partial
+        """
+        if candles:
+            last_candle_time = candles[-1].time
+            new_candles = self._request(after=last_candle_time, count=5000)
+            candles[-1:] = new_candles
+            if len(new_candles) >= 5000:
+                self.extend(candles)
         else:
-            raise ValueError(f"Specified start, end, as well as count.")
-        request = InstrumentsCandles(instrument=self.instrument, params=params)
-        response = self.api.request(request)
-        return CandleSequence.from_oanda(response)
+            candles[:] = self._request(count=100)
+        return candles[-1].complete
+
+    # ---------------------------------------------------------------------------
+    # Helpers
+    # ---------------------------------------------------------------------------
+
+    def _request(
+        self, count: int = None, before: int = None, after: int = None
+    ) -> List[Candle]:
+        params = dict(self.params)
+        if count is not None:
+            params["count"] = count
+        if after is not None:
+            params["from"] = after
+        if before is not None:
+            params["to"] = before
+        response = self.session.get(self.url, headers=self.headers, params=params)
+        response.raise_for_status()
+        data = response.json()
+        return [Candle.from_oanda(_) for _ in data["candles"]]

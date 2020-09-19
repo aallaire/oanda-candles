@@ -1,8 +1,78 @@
 # oanda-candles
-Oanda forex candle API built on top of oandapyV20
+Client to make getting Oanda candle data easy.
+
+### Quick Example
+```python
+import os
+from oanda_candles import CandleClient, Pair, Gran
+
+token = os.getenv("OANDA_TOKEN")
+
+# Initialize Client with token, real as False for practice account.
+client = CandleClient(token, real=False)
+
+# Initialize collector for Euro/US Dollar 4 hour candles.
+collector = client.get_collector(Pair.EUR_USD, Gran.H4)
+
+# Print the opening and closing bid price of the most recent 100 candles.
+candles = collector.grab(100)
+for candle in candles:
+    print(f"{candle.time.get_pretty()}: Open bid: {candle.bid.o} Close bid: {candle.bid.c}")
+
+# Get list of 300 candles from 8000 candles back
+special_300 = collector.grab_offset(8000, 300)
+```
+
+### Public Classes in this Package
+| Class | Description
+| ----- |:-----|
+| Candle | Data about one candle containing a start time and three Ohlc objects for the bid, mid, and ask prices |
+| CandleClient | Collection of one CandleCollector for each combination of `pair` and `gran` |
+| CandleCollector | For grabbing candles for a specific `pair` and `gran` |
+| CandleMeister | Provides a single CandleCollector so one does not have to pass it around between modules |
+| Gran | Candle granularity (duration), one of the spefic values allowed by Oanda's API such as Gran.H6 for six hour |
+| Ohlc | Contains open, high, low, and closing prices as attrs `o`, `h`, `l`, and `c` |
+| Pair | One of 28 forex currency pairs. Can be specified like `Pair.EUR_USD` or `Pair("eurusd")` |
+| TimeInt | Integer subclass representing time since Jan 1, 1970 in UTC, candles have this as their `time` attribute |
+
+
+### Some Features
+1. Candle data is cached automatically so calling `grab` or `grab_offset` for same candles do not require another server requests.
+1. However, when candles are grabbed, the cache is updated to include the most recent candles provided at least
+three seconds have passed since the last time they were updated.
+1. The Candle objects returned have the bid, mid, and ask prices and have times expressed as UTC epoch integers.
+1. Candles are aligned to reasonable offset defaults (month candles start at start of month in UTC).
+1. Candle alignment is preset to always start days and month candles on the start of the day and month UTC.
+
+### Some Limitations.
+1. Requires secret Oanda Access token to initialize client.
+1. Only candle granularity levels supported by Oanda's V20 RestfulAPI are available.
+1. Only forex pairs (instruments) supported by the forex-types package are supported (The 28 pair combinations for the 8 major currencies).
+1. Not all the options of Oanda's V20 candle endpoint are available. Rather reasonable values are already preset.
+(considering the very odd defaults and the confusing way the options work, this is kind of a feature type limitation,
+still in a future version these likely should be made configurable for any masachists that want to mess with them).
+
+
+
+### Steps followed by `grab` and `grab_offset` methods
+When either the `grab` or `grab_offset` methods are called on a particular `CandleCollector` object, it:
+1. Makes sure candle cache is up to date with latest candles by querying Oanda if its been longer than 3 seconds since this was last done.
+1. If the candles in the cache do not go back far enough to provide the number requested get older candles from Oanda until it does.
+1. Return the requested candles, while keeping the cached list for the next grab calls.
+
 
 #### CAVEAT:
-This is still in rapid initial development and features might change drastically.
+This is still a beta type package--although between 0.0.10 and 0.1.0 it became somewhat less beta-ish.
+
+#### Version history.
+
+new in version 0.1.0:
+1. Reliance on opandaV20 package was dropped in favor of using requests package directly.
+1. Everything was refactored into smaller simpler less "exploratory" code.
+1. Updating TimeInt package to 0.0.9 which is entirely UTC, without any accidental local times popping in.
+1. Month candles are aligned right at start of month UTC. And day candles at start of day and so forth.
+1. CandleSequence class which had no real utility compared to highe level grab classes were refactored out. 
+1. Only tested refactoring by hand, unittests have to be rewritten (since they were full of funky time alignment that we no longer have.)
 
 new in version 0.0.10:
 1. Updated time-int dependency from 0.0.6 to 0.0.7.
@@ -31,7 +101,7 @@ new in version 0.0.7:
 
 
 
-### Oanda Access Token
+### About Oanda Access Tokens
 Using this package requires an access token to a user's
 Oanda brokerage account. This module only uses the token to
 request candle data, but such tokens can be used to make
@@ -48,90 +118,3 @@ the trading week (at 5pm New York time). During the maintenance you
 may get a 401 http response that looks like your token is not valid
 even if it is.
 
-### Quick Example
-Supposing that token is in the env var `OANDA_TOKEN`, one could print
-the opening bid price of the latest 100 trading hours for the Aussie like this: 
-
-```python
-import os
-from oanda_candles import Pair, Gran, CandleCollector
-
-token = os.getenv("OANDA_TOKEN")
-
-collector = CandleCollector(token, Pair.AUD_USD, Gran.H1)
-candles = collector.grab(100)
-
-for candle in candles:
-    print(candle.bid.o)
-```
-Note the CandleCollector remembers the candles it downloads and also keeps track of how fresh they are and has
-some heuristics about when it should download updates to them, such that you can spam run its `grab(count)` method
-in an event loop without worrying about spamming the Oanda API.
-
-### Using CandleMeister
-The `CandleMeister` is a single globally available class that manages one `CandleCollector` for each
-pair/granularity combination. While the `CandleClient` is the same idea but as an object where you
-can have more than one...in those cases where you may want more than one...which I can't think of.
-
-To use the CandleMeister to grab any candles, you must make sure it that it is initialized
-with the Oanda token. For example if the env var `OANDA_TOKEN` has your token do the following
-right at the startup of your application before you create your widgets:
-```python
-import os
-from oanda_candles import CandleMeister
-
-token = os.getenv("OANDA_TOKEN")
-CandleMeister.init_meister(token)
-```
-Then you can you can grab candles from any module you like (provided you don't do it at import time)
-like so:
-```python
-from oanda_candles import CandleMeister, Pair, Gran
-
-...
-def some_func(*args, **kwargs):
-    ...
-    euro_weekly_candles = CandleMeister.grab(Pair.EUR_USD, Gran.W, 100)
-    ...
-```
-Note that if the `CandleMeister.grab` method was used outside of the function in this
-example, then it would probably end up called as your modules were imported before your
-were able to initialize the CandleMeister with the token. It is thus recommended you
-keep such calls inside callback methods and not try to make them at import time.
-
-### Summary of Basic Usage
-1. A `CandleCollector` object is initialized with a token, forex pair, and granularity.
-1. To get a list of the latest `count` `Candle` objects at any given time run the `grab(count)` method of collector.
-1. The `grab(count)` method is safe to spam call in an event loop without slowing down to poll as the collector handles throttling and caching.
-1. Each `Candle` has three `Ohlc` objects, one for Bid, Mid, and Ask prices, and a `time` attribute with the start of the candle time.
-1. The `Ohlc` objects have open, high, low, and close `Price` objects
-
-### Understanding Request Ranges.
-**Note**: This section is semi-deprecated by the `CandleCollector` which is new in 0.0.7, in
-the sense that in most use cases in a candle application it seems to me the `CandleCollector`
-is just a better way to go than the lower level `CandleRequester`.
-
-The `CandleRequester.request()` has `start`, `end`, and `count`
-optional parameters used to specify how many candles and from when.
-
-
- parameter | valid types | valid range | default
- --- | --- |---| ---
-start | TimeInt, datetime, None | epoch to now | --
-end | TimeInt, datetime, None | epoch to now | now
-count | int, None | 1 to 5000 | 500
-
-It does not make sense to set all three of these parameters, but you can
-specify any single one of them, or any two of them, or none of them.
-The behavior for when they are set or unset is shown in this table:
-
-start | end | count | behavior
- --- | --- | ---| ---
--- | -- | -- | Get latest 500 candles
--- | -- | set | Get latest count candles
--- | set | -- | Get last 500 candles up until the end time
--- | set | set | Get last count candles up until the end time
-set | -- | -- | Get the first 500 candles from start time
-set | -- | set | Get the first count candles from start time
-set | set | -- | Get candles from start to end times
-set | set | set | ValueError (there might be a different count in the range)

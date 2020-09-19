@@ -2,4 +2,4 @@ from oanda_candles import __version__
 
 
 def test_version():
-    assert __version__ == "0.0.10"
+    assert __version__ == "0.1.0"

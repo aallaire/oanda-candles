@@ -1,6 +1,10 @@
-from time_int import TimeInt
+from datetime import datetime
+from time import struct_time
 from typing import Tuple
+
+from forex_types import FracPips, Price
 from magic_kind import MagicKind
+from time_int import TimeInt
 
 from .quote_kind import QuoteKind
 from .ohlc import Ohlc
@@ -31,7 +35,7 @@ class Candle:
             Ohlc.from_oanda(data["ask"]),
             Ohlc.from_oanda(data["bid"]),
             Ohlc.from_oanda(data["mid"]),
-            TimeInt.from_unix(data["time"]),
+            TimeInt.from_float_string(data["time"]),
             data["complete"],
         )
 
@@ -83,3 +87,33 @@ class Candle:
     def __hash__(self):
         """We just use time to hash candles into buckets."""
         return hash(self.time)
+
+    @property
+    def high(self) -> Price:
+        """highest ask price."""
+        return self.ask.h
+
+    @property
+    def low(self) -> Price:
+        """lowest bid price."""
+        return self.bid.l
+
+    @property
+    def high_fp(self) -> FracPips:
+        """highest ask price as fraction pips"""
+        return self.ask.h_fp
+
+    @property
+    def low_fp(self) -> FracPips:
+        """lowest bid price as fractional pips"""
+        return self.bid.l_fp
+
+    @property
+    def time_dt(self) -> datetime:
+        """Start time of candle as a datetime (datetime package)."""
+        return self.time.get_datetime()
+
+    @property
+    def time_st(self) -> struct_time:
+        """Start time of candle as struct_time (time package)."""
+        return self.time.get_struct_time()
